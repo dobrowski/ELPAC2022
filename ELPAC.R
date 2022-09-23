@@ -148,10 +148,14 @@ elpac.mry %>%
            !is.na(OverallPerfLvl4Pcnt),
            #    !str_detect(Subgroup, " - ")
     ) %>%
-    mutate(Grade.n = paste0(Grade," (",TotalTestedWithScores,")" )) %>%
-    lollipop(OverallPerfLvl4Pcnt,
-             Grade.n,
-             "pink") +
+    mutate(Grade.n = paste0(Grade," (",TotalTestedWithScores,")" ),
+           grade.level = as.numeric(Grade),
+           Grade.n = fct_reorder(Grade.n, grade.level)
+    ) %>%
+    ggplot() + 
+    geom_col( aes(x = Grade.n, y = OverallPerfLvl4Pcnt/100), fill = "pink") +
+    theme_hc() +
+    scale_y_continuous(labels = label_percent()) +
     labs(x = "",
          y = "",
          color ="",
@@ -161,7 +165,7 @@ elpac.mry %>%
 
 
 ggsave(here("figs", paste0("Monterey County ELPAC by Grade ",  Sys.Date(),".png" )),
-       width = 8, height = 6)
+       width = 9, height = 6)
 
 
 elpac.school.by.grade <- function(dist, schoo) {
@@ -229,6 +233,7 @@ elpac.district.by.grade <- function(dist) {
 
 elpac.district.by.grade("North Monterey")
 
+elpac.district.by.grade("Monterey Peninsula")
 
 # District by School
 
